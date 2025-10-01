@@ -7,4 +7,4 @@ dotenv.config({
   path: `.env.${process.env.ENV_MODE}`,
 });
 
-export const { PORT, ENV_MODE } = process.env;
+export const { PORT, ENV_MODE, MONGO_URI, JWT_SECRET } = process.env;

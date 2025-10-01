@@ -4,13 +4,19 @@ import messageRouter from "./routes/message.route.js";
 import { PORT } from "./config/env.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { connectDB } from "./lib/db.js";
+import errorMiddleware from "./middlewares/error.middleware.js";
 
 const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+server.use(express.json()); // req.body
+
 server.use("/api/v1/auth", authRouter);
 server.use("/api/v1/messages", messageRouter);
+
+server.use(errorMiddleware);
 
 // 배포 환경에서 static 파일을 가져오는 곳(react)
 if (process.env.NODE_ENV === "prod") {
@@ -22,4 +28,5 @@ if (process.env.NODE_ENV === "prod") {
 
 server.listen(PORT || 3000, () => {
   console.log("listen");
+  connectDB();
 });
