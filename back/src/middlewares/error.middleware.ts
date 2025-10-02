@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "../lib/utils/AppError.js";
+import { AppError } from "../lib/error.js";
 
 export const errorMiddleware = (
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   console.error(err.stack);
 

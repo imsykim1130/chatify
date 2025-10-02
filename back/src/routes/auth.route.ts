@@ -1,6 +1,6 @@
 import express from "express";
 import { signup } from "../controllers/auth.controller.js";
-import { asyncWrap } from "../lib/utils/asyncWrap.js";
+import { asyncWrap } from "../lib/utils.js";
 
 const authRouter = express.Router();
 

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import { generateToken } from "../lib/utils/jwt.js";
+import { generateToken } from "../lib/jwt.js";
 
 export const signup = async (req: Request, res: Response) => {
   const { fullName, email, password } = req.body;
@@ -9,13 +9,11 @@ export const signup = async (req: Request, res: Response) => {
   if (!fullName || !email || !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
-
   // user check
   const user = await User.findOne({ email });
   if (user) {
     return res.status(400).json({ message: "Email already exists" });
   }
-
   // password check
   if (password.length < 6) {
     return res
@@ -27,7 +25,6 @@ export const signup = async (req: Request, res: Response) => {
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: "Invalid email format" });
   }
-
   // create user
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -40,10 +37,10 @@ export const signup = async (req: Request, res: Response) => {
   if (!newUser)
     return res.status(500).json({ message: "User creation failed" });
 
-  // jwt token
+  await newUser.save();
+
   generateToken(newUser._id.toString(), res);
 
-  await newUser.save();
   res.status(201).json({
     _id: newUser._id,
     fullName: newUser.fullName,

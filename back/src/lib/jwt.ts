@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
-import {ENV_MODE, JWT_SECRET} from "../../config/env.js";
 import { Response } from "express";
+import { ENV_MODE, JWT_SECRET } from "../config/env.js";
 
 export const generateToken = (userId: string, res: Response) => {
-  const token = jwt.sign({ userId }, JWT_SECRET!, { expiresIn: "7d" });
+  if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
+  const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
   res.cookie("token", token, {
     httpOnly: true, // prevent XSS attacks
     secure: ENV_MODE !== "dev",
