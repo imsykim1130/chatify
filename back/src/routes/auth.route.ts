@@ -4,11 +4,11 @@ import { asyncWrap } from "../lib/utils.js";
 
 const authRouter = express.Router();
 
-authRouter.get("/signup", asyncWrap(signup));
-authRouter.get("/login", (req, res) => {
+authRouter.post("/signup", asyncWrap(signup));
+authRouter.post("/login", (req, res) => {
   res.send("");
 });
-authRouter.get("/logout", (req, res) => {
+authRouter.post("/logout", (req, res) => {
   res.send("");
 });
 
