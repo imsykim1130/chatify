@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../lib/jwt.js";
+import { sendWelcomeEmail } from "../lib/email.js";
+import { CLIENT_URL } from "../config/env.js";
 
 export const signup = async (req: Request, res: Response) => {
   const { fullName, email, password } = req.body;
@@ -41,12 +43,13 @@ export const signup = async (req: Request, res: Response) => {
 
   generateToken(newUser._id.toString(), res);
 
+  // send welcome email
+  await sendWelcomeEmail(email, fullName, CLIENT_URL!);
+
   res.status(201).json({
     _id: newUser._id,
     fullName: newUser.fullName,
     email: newUser.email,
     profilePic: newUser.profilePic,
   });
-
-  // TODO: send welcome email
 };
