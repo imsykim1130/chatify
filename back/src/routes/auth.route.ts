@@ -16,7 +16,7 @@ authRouter.post("/signup", asyncWrap(signup));
 authRouter.post("/login", asyncWrap(login));
 authRouter.post("/logout", asyncWrap(logout));
 authRouter.put("/profile", verifyCookie, asyncWrap(updateProfile));
-authRouter.get("/ckeck", verifyCookie, (req, res) =>
+authRouter.get("/check", verifyCookie, (req, res) =>
   res.status(200).json(req.user),
 );
 
