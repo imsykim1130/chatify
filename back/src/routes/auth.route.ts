@@ -7,10 +7,11 @@ import {
 } from "../controllers/auth.controller.js";
 import { asyncWrap } from "../lib/utils.js";
 import { verifyCookie } from "../middlewares/auth.middleware.js";
-import { UserType } from "../types/auth.type.js";
+import { arcjetMiddleware } from "../middlewares/arcjet.middleware.js";
 
 const authRouter = express.Router();
 
+authRouter.use(arcjetMiddleware);
 authRouter.post("/signup", asyncWrap(signup));
 authRouter.post("/login", asyncWrap(login));
 authRouter.post("/logout", asyncWrap(logout));
