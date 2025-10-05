@@ -8,7 +8,8 @@
     "esModuleInterop": true,
     "resolveJsonModule": true, // json import 가능
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,6 +1,5 @@
 import { Resend } from "resend";
 import { EMAIL_FROM, EMAIL_FROM_NAME, RESEND_API_KEY } from "../config/env.js";
-import { AppError } from "./error.js";
 
 const resendClient = new Resend(RESEND_API_KEY);
 const sender = {
@@ -11,7 +10,7 @@ const sender = {
 export const sendWelcomeEmail = async (
   email: string,
   name: string,
-  clientURL: string,
+  clientURL: string
 ) => {
   const { data, error } = await resendClient.emails.send({
     from: `${sender.name} <${sender.email}>`,
@@ -21,8 +20,7 @@ export const sendWelcomeEmail = async (
   });
 
   if (error) {
-    console.log(error.message);
-    throw new AppError("Failed to send welcome email: " + error, 500);
+    throw new Error("Failed to send welcome email: " + error);
   }
 
   console.log("Email sent successfully:", data);

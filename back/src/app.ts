@@ -6,12 +6,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { connectDB } from "./lib/db.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
+import cookieParser from "cookie-parser";
 
 const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 server.use(express.json()); // req.body
+server.use(cookieParser());
 
 server.use("/api/v1/auth", authRouter);
 server.use("/api/v1/messages", messageRouter);

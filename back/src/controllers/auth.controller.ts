@@ -4,7 +4,13 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../lib/jwt.js";
 import { sendWelcomeEmail } from "../lib/email.js";
 import { CLIENT_URL } from "../config/env.js";
-import { LogInRequest, SignUpRequest } from "../types/auth.type.js";
+import {
+  LogInRequest,
+  SignUpRequest,
+  UpdateProfileRequest,
+  UserType,
+} from "../types/auth.type.js";
+import { uploadProfilePic } from "../lib/cloudinary.js";
 
 export const signup = async (req: Request, res: Response) => {
   const { fullName, email, password }: SignUpRequest = req.body;
@@ -90,4 +96,26 @@ export const logout = async (req: Request, res: Response) => {
   // remove token in cookie
   res.cookie("jwt", "", { maxAge: 0 });
   res.status(200).json({ message: "Logged out successfully" });
+};
+
+export const updateProfile = async (
+  req: Request & { body: { profilePic: string } },
+  res: Response,
+) => {
+  const { profilePic } = req.body;
+
+  if (!profilePic)
+    return res.status(400).json({ message: "profilePic is required" });
+
+  const userId = req.user?._id;
+  const secureUrl = await uploadProfilePic(profilePic);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      profilePic: secureUrl,
+    },
+    { new: true }, // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
+  ).select("-password");
+  res.status(200).json(updatedUser);
 };
