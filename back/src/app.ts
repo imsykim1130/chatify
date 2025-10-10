@@ -7,29 +7,30 @@ import { fileURLToPath } from "url";
 import { connectDB } from "./lib/db.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
+import { app, server } from "./lib/socket.js";
 
-const server = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // TODO: payload too large error
-server.use(express.json()); // req.body
-server.use(cookieParser());
+app.use(cookieParser());
+app.use(express.json()); // req.body
 
-server.use("/api/v1/auth", authRouter);
-server.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/messages", messageRouter);
 
-server.use(errorMiddleware);
+app.use(errorMiddleware);
 
 // 배포 환경에서 static 파일을 가져오는 곳(react)
 if (process.env.NODE_ENV === "prod") {
-  server.use(express.static(path.join(__dirname, "../../front/dist")));
-  server.get("*", (_, res) => {
+  app.use(express.static(path.join(__dirname, "../../front/dist")));
+  app.get("*", (_, res) => {
     res.sendFile(path.join(__dirname, "../../front", "dist", "index.html"));
   });
 }
 
-server.listen(PORT || 3000, () => {
-  console.log("listen");
+const port = PORT || 3000;
+server.listen(port, () => {
+  console.log("listen ", port);
   connectDB();
 });

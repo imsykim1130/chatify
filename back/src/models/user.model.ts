@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { UserType } from "../types/auth.type.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -21,8 +22,8 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
   },
-  { timestamps: true } // createdAt, updatedAt
+  { timestamps: true }, // createdAt, updatedAt
 );
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model<UserType>("User", userSchema);
 export default User;

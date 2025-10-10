@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "rootDir": "./src",
@@ -9,8 +9,8 @@
     "resolveJsonModule": true, // json import 가능
     "strict": true,
     "skipLibCheck": true,
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "typeRoots": ["./src/types"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["node_modules"]
 }

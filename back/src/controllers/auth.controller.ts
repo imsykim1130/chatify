@@ -10,7 +10,7 @@ import {
   UpdateProfileRequest,
   UserType,
 } from "../types/auth.type.js";
-import { uploadProfilePic } from "../lib/cloudinary.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req: Request, res: Response) => {
   const { fullName, email, password }: SignUpRequest = req.body;
@@ -108,12 +108,12 @@ export const updateProfile = async (
     return res.status(400).json({ message: "profilePic is required" });
 
   const userId = req.user?._id;
-  const secureUrl = await uploadProfilePic(profilePic);
+  const response = await cloudinary.uploader.upload(profilePic);
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     {
-      profilePic: secureUrl,
+      profilePic: response.secureUrl,
     },
     { new: true }, // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
   ).select("-password");

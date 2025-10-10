@@ -1,9 +1,11 @@
-import { UserType } from "./auth.type.js";
+import { UserType } from "../auth.type";
 
 declare global {
   namespace Express {
-    export interface Request {
+    interface Request {
       user?: Omit<UserType, "password">;
     }
   }
 }
+
+export {};
