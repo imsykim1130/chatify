@@ -16,5 +16,8 @@ authRouter.post("/signup", asyncWrap(signup));
 authRouter.post("/login", asyncWrap(login));
 authRouter.post("/logout", asyncWrap(logout));
 authRouter.put("/profile", verifyCookie, asyncWrap(updateProfile));
+authRouter.get("/check", verifyCookie, async (req, res) => {
+  res.status(200).json(req.user);
+});
 
 export default authRouter;
