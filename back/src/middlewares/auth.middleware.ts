@@ -11,7 +11,7 @@ export const verifyCookie = async (
 ) => {
   const token = await req.cookies.jwt;
   if (!token) {
-    return res.status(400).json({ message: "No token provided" });
+    return res.status(401).json({ message: "No token provided" });
   }
 
   if (!JWT_SECRET) return res.status(401).json({ message: "No JWT secret" });

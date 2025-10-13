@@ -1,20 +1,22 @@
 import express, { Request, Response } from "express";
 import authRouter from "./routes/auth.route.js";
 import messageRouter from "./routes/message.route.js";
-import { PORT } from "./config/env.js";
+import { CLIENT_URL, PORT } from "./config/env.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { connectDB } from "./lib/db.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
 import { app, server } from "./lib/socket.js";
+import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // TODO: payload too large error
-app.use(cookieParser());
 app.use(express.json()); // req.body
+app.use(cors({ origin: CLIENT_URL, credentials: true }));
+app.use(cookieParser());
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/messages", messageRouter);
