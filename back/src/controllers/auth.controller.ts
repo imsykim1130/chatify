@@ -48,7 +48,7 @@ export const signup = async (req: Request, res: Response) => {
 
   await newUser.save();
 
-  // generateToken(newUser._id.toString(), res);
+  generateToken(newUser._id.toString(), res);
 
   // send welcome email
   // await sendWelcomeEmail(email, fullName, CLIENT_URL!);
@@ -100,7 +100,7 @@ export const logout = async (req: Request, res: Response) => {
 
 export const updateProfile = async (
   req: Request & { body: { profilePic: string } },
-  res: Response,
+  res: Response
 ) => {
   const { profilePic } = req.body;
 
@@ -115,7 +115,7 @@ export const updateProfile = async (
     {
       profilePic: response.secureUrl,
     },
-    { new: true }, // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
+    { new: true } // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
   ).select("-password");
   res.status(200).json(updatedUser);
 };

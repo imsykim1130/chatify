@@ -3,7 +3,13 @@ export type UserType = {
   email: string;
   fullName: string;
   profilePic: string;
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
+  // createdAt: Date;
+  // updatedAt: Date;
+  // __v: number;
+};
+
+export type SignUpRequest = {
+  fullName: string;
+  email: string;
+  password: string;
 };
