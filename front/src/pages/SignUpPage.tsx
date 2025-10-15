@@ -20,7 +20,7 @@ const SignUpPage = () => {
         <BorderAnimatedContainer>
           <div className="w-full flex">
             {/* left */}
-            <div className="w-full min-w-[500px] p-8 flex flex-col items-center justify-center md:border-r border-slate-600/30">
+            <div className="w-full p-8 flex flex-col items-center justify-center md:border-r border-slate-600/30">
               <div className="flex flex-col items-center mb-8">
                 <MessageCircleIcon className="mb-3 size-8" />
                 <h2 className="text-2xl font-bold text-slate-200 mb-2">
