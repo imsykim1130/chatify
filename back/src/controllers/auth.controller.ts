@@ -1,9 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../lib/jwt.js";
-import { sendWelcomeEmail } from "../lib/email.js";
-import { CLIENT_URL } from "../config/env.js";
 import {
   LogInRequest,
   SignUpRequest,
@@ -11,6 +9,7 @@ import {
   UserType,
 } from "../types/auth.type.js";
 import cloudinary from "../lib/cloudinary.js";
+import multer from "multer";
 
 export const signup = async (req: Request, res: Response) => {
   const { fullName, email, password }: SignUpRequest = req.body;
@@ -99,23 +98,36 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 export const updateProfile = async (
-  req: Request & { body: { profilePic: string } },
-  res: Response
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-  const { profilePic } = req.body;
+  try {
+    const { profilePic } = req.body;
 
-  if (!profilePic)
-    return res.status(400).json({ message: "profilePic is required" });
+    if (!profilePic)
+      return res.status(400).json({ message: "profilePic is required" });
 
-  const userId = req.user?._id;
-  const response = await cloudinary.uploader.upload(profilePic);
-
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    {
-      profilePic: response.secureUrl,
-    },
-    { new: true } // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
-  ).select("-password");
-  res.status(200).json(updatedUser);
+    const userId = req.user?._id;
+    await cloudinary.uploader
+      .upload(profilePic, {
+        folder: "chatify-profile-pics",
+      })
+      .then(async (response) => {
+        console.log(response);
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          {
+            profilePic: response.secure_url,
+          },
+          { new: true } // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
+        ).select("-password");
+        res.status(200).json(updatedUser);
+      })
+      .catch((e) => {
+        console.error("Error in update profile: ", e);
+      });
+  } catch (e) {
+    next(e);
+  }
 };

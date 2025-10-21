@@ -14,7 +14,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // TODO: payload too large error
-app.use(express.json()); // req.body
+// 이미지 base64 는 긴 경우가 많기 때문에 limit 늘려줌
+app.use(express.json({ limit: "10mb" })); // req.body
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 

@@ -4,6 +4,7 @@ import {
   CLOUDINARY_API_SECRET,
   CLOUDINARY_CLOUD_NAME,
 } from "../config/env.js";
+import multer, { Multer } from "multer";
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,

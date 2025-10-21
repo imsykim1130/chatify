@@ -5,20 +5,25 @@ import toast from "react-hot-toast";
 
 type AuthState = {
   authUser: UserType | null;
+  onlineUsers: number[];
   isCheckingAuth: boolean;
   isSigningUp: boolean;
   isLoggingIn: boolean;
+  isUsersLoading: boolean;
   checkAuth: () => void;
   signUp: (data: SignUpRequest) => void;
   signIn: (data: SignInRequest) => void;
   logout: () => void;
+  updateProfile: (file: File) => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
   authUser: null,
+  onlineUsers: [],
   isCheckingAuth: true,
   isLoggingIn: false,
   isSigningUp: false,
+  isUsersLoading: false,
   checkAuth: async () => {
     await axiosInstance
       .get("/auth/check")
@@ -76,4 +81,37 @@ export const useAuthStore = create<AuthState>((set) => ({
         console.error(e);
       });
   },
+  updateProfile: async (file: File) => {
+    const base64Image = await imageFileToBase64(file);
+    console.log(base64Image);
+
+    await axiosInstance
+      .post("/auth/profile", {
+        profilePic: base64Image,
+      })
+      .then((res) => {
+        const updatedUser = res.data;
+        set({ authUser: updatedUser });
+      })
+      .catch((e) => {
+        console.log("Error in update profile: ", e);
+        toast.error("Error in update profile");
+      });
+  },
 }));
+
+function imageFileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result as string); // reader.result contains the Base64 data URL
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+
+    reader.readAsDataURL(file); // Read the file as a data URL
+  });
+}

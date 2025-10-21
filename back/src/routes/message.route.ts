@@ -14,7 +14,7 @@ const messageRouter = express.Router();
 messageRouter.use(arcjetMiddleware, verifyCookie);
 
 messageRouter.get("/contacts", getAllContacts);
-messageRouter.get("/chat", getChatPartners);
+messageRouter.get("/chats", getChatPartners);
 messageRouter.get("/:id", getMessagesByUserId);
 messageRouter.post("/send/:id", sendMessage);
 
