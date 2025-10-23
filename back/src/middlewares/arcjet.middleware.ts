@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import arcjet from "@arcjet/node";
 import aj from "../lib/arcjet.js";
 import { isSpoofedBot } from "@arcjet/inspect";
 

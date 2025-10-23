@@ -6,16 +6,7 @@ import { getReceiverSocketId, io } from "../lib/socket.js";
 import { UserType } from "../types/auth.type.js";
 import { MessageType } from "../types/message.type.js";
 
-/**
- * 로그인 유저를 제외한 모든 유저 가져오기
- *
- * @param {Request} req - The HTTP request object, containing information about the logged-in user.
- * @param {Response} res - The HTTP response object used to send the resulting user data or errors.
- * @param {NextFunction} next - The callback function to pass errors to the next middleware.
- * @throws Will pass any encountered errors to the next middleware using `next`.
- * @description Queries the database to fetch a list of users, excluding the user currently authenticated via `req.user._id`.
- * Responds with a JSON object containing the list of users on success or an error status if an exception occurs.
- */
+// 로그인 유저를 제외한 모든 유저 가져오기
 export const getAllContacts = async (
   req: Request,
   res: Response,
@@ -36,15 +27,7 @@ export const getAllContacts = async (
   }
 };
 
-/**
- * Asynchronously retrieves chat messages between the currently authenticated user and another user specified by their user ID.
- *
- * @function getMessagesByUserId
- * @param {Request} req - The HTTP request object, containing user authentication data and route parameters.
- * @param {Response} res - The HTTP response object, used to send the retrieved messages or errors.
- * @param {NextFunction} next - Middleware callback to pass control to the next middleware in case of an error.
- * @throws Will pass any encountered database or processing errors to the next middleware.
- */
+// 특정 유저의 메세지 가져오기
 export const getMessagesByUserId = async (
   req: Request,
   res: Response,
@@ -66,6 +49,7 @@ export const getMessagesByUserId = async (
   }
 };
 
+// 대화를 주고 받은 유저들
 export const getChatPartners = async (
   req: Request,
   res: Response,
@@ -73,8 +57,10 @@ export const getChatPartners = async (
 ) => {
   try {
     const loggedInUserId = req.user?._id;
+    console.log(loggedInUserId);
+
     const messages = await Message.find({
-      $or: [{ sender: loggedInUserId }, { receiver: loggedInUserId }],
+      $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
     });
 
     const chatPartnerIds = [
@@ -97,6 +83,7 @@ export const getChatPartners = async (
   }
 };
 
+// 메세지 보내기
 export const sendMessage = async (
   req: Request,
   res: Response,
@@ -108,6 +95,7 @@ export const sendMessage = async (
     const senderId = req.user?._id;
 
     let imageUrl = "";
+    // 이미지 메세지인 경우
     if (image) {
       const response = await cloudinary.uploader.upload(image);
       imageUrl = response.secure_url;
