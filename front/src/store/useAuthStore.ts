@@ -2,6 +2,10 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import type { SignInRequest, SignUpRequest, UserType } from "../type";
 import toast from "react-hot-toast";
+import { io, Socket } from "socket.io-client";
+
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
 
 type AuthState = {
   authUser: UserType | null;
@@ -10,20 +14,24 @@ type AuthState = {
   isSigningUp: boolean;
   isLoggingIn: boolean;
   isUsersLoading: boolean;
+  socket: Socket | null;
   checkAuth: () => void;
   signUp: (data: SignUpRequest) => void;
   signIn: (data: SignInRequest) => void;
   logout: () => void;
   updateProfile: (file: File) => void;
+  connectSocket: () => void;
+  disconnectSocket: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   authUser: null,
   onlineUsers: [],
   isCheckingAuth: true,
   isLoggingIn: false,
   isSigningUp: false,
   isUsersLoading: false,
+  socket: null,
   checkAuth: async () => {
     await axiosInstance
       .get("/auth/check")
@@ -59,8 +67,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     await axiosInstance
       .post("/auth/login", data)
       .then((res) => {
-        toast.success("로그인 성공!");
+        console.log(res.data);
         set({ authUser: res.data });
+        toast.success("로그인 성공!");
+        get().connectSocket();
       })
       .catch((e) => {
         toast.error(e.response.data.message);
@@ -83,7 +93,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   updateProfile: async (file: File) => {
     const base64Image = await imageFileToBase64(file);
-    console.log(base64Image);
 
     await axiosInstance
       .post("/auth/profile", {
@@ -92,11 +101,37 @@ export const useAuthStore = create<AuthState>((set) => ({
       .then((res) => {
         const updatedUser = res.data;
         set({ authUser: updatedUser });
+        toast.success("프로필 변경 완료!");
       })
       .catch((e) => {
         console.log("Error in update profile: ", e);
         toast.error("Error in update profile");
       });
+  },
+  connectSocket: () => {
+    console.log("connect socket");
+
+    const { authUser } = get();
+    if (!authUser || get().socket?.connected) return;
+
+    const socket = io(BASE_URL, {
+      withCredentials: true,
+    });
+
+    socket.connect();
+
+    set({ socket });
+
+    socket.on("getOnlineUsers", (userIds) => {
+      console.log(userIds);
+
+      set({ onlineUsers: userIds });
+    });
+  },
+  disconnectSocket: () => {
+    if (get().socket?.connected) {
+      get().socket?.disconnect();
+    }
   },
 }));
 

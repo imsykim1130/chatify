@@ -1,5 +1,4 @@
 import { Request } from "express";
-import mongoose from "mongoose";
 
 export type SignUpRequest = {
   email: string;
@@ -22,7 +21,7 @@ export interface UpdateProfileRequest extends Request {
 }
 
 export type UserType = {
-  _id: mongoose.Types.ObjectId;
+  _id: string;
   fullName: string;
   email: string;
   password?: string;

@@ -6,7 +6,6 @@ import ContactList from "../components/ContactList";
 import NoConversationPlaceholder from "../components/NoConversationPlaceholder";
 import ProfileHeader from "../components/ProfileHeader";
 import { useChatStore } from "../store/useChatStore";
-import { axiosInstance } from "../lib/axios";
 
 const ChatPage = () => {
   const { activeTab, selectedUser } = useChatStore();
@@ -28,20 +27,6 @@ const ChatPage = () => {
           {selectedUser ? <ChatContainer /> : <NoConversationPlaceholder />}
         </div>
       </BorderAnimatedContainer>
-      <button
-        onClick={() => {
-          axiosInstance
-            .get("/auth/check")
-            .then((res) => {
-              console.log(res.data);
-            })
-            .catch((e) => {
-              console.error(e);
-            });
-        }}
-      >
-        check
-      </button>
     </div>
   );
 };

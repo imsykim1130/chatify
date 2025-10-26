@@ -38,8 +38,8 @@ export const getMessagesByUserId = async (
     const { id: userToChatId } = req.params;
     const messages = await Message.find<MessageType>({
       $or: [
-        { sender: myId, receiver: userToChatId },
-        { sender: userToChatId, receiver: myId },
+        { senderId: myId, receiverId: userToChatId },
+        { senderId: userToChatId, receiverId: myId },
       ],
     });
     res.status(200).json(messages);
@@ -57,7 +57,6 @@ export const getChatPartners = async (
 ) => {
   try {
     const loggedInUserId = req.user?._id;
-    console.log(loggedInUserId);
 
     const messages = await Message.find({
       $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
@@ -66,7 +65,7 @@ export const getChatPartners = async (
     const chatPartnerIds = [
       ...new Set<string>(
         messages.map((message) =>
-          message.senderId === loggedInUserId
+          message.senderId.toString() === loggedInUserId?.toString()
             ? message.receiverId.toString()
             : message.senderId.toString(),
         ),
@@ -101,6 +100,7 @@ export const sendMessage = async (
       imageUrl = response.secure_url;
     }
 
+    // DB 에 메세지 저장
     const message = new Message({
       senderId,
       receiverId,
@@ -109,8 +109,11 @@ export const sendMessage = async (
     });
     await message.save();
 
+    // 메세지 수신자가 온라인 상태라면 소켓으로 메세지 바로 전송
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
+      console.log("new message socket");
+
       io.to(receiverSocketId).emit("newMessage", message);
     }
 

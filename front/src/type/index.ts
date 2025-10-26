@@ -1,5 +1,5 @@
 export type UserType = {
-  _id: number;
+  _id: string;
   email: string;
   fullName: string;
   profilePic: string;
@@ -29,6 +29,17 @@ export type Chat = {
   __id: number;
 };
 
-export type Message = {
-  __id: number;
+export type SendMessageRequest = {
+  text?: string;
+  image?: string;
+};
+
+export type MessageType = {
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  text?: string;
+  image?: string;
+  createdAt: string;
+  isOptimistic: boolean;
 };

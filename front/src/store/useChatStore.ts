@@ -1,12 +1,13 @@
 import { create } from "zustand";
-import type { Message, UserType } from "../type";
+import type { MessageType, SendMessageRequest, UserType } from "../type";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { useAuthStore } from "./useAuthStore.ts";
 
 type ChatState = {
   contacts: UserType[];
   chatPartners: UserType[];
-  messages: Message[];
+  messages: MessageType[];
   activeTab: string;
   selectedUser: UserType | null;
   isContactsLoading: boolean;
@@ -15,11 +16,13 @@ type ChatState = {
   isSoundEnabled: boolean;
   toggleSound: () => void;
   setActiveTab: (tab: string) => void;
-  setSelectedUser: (user: UserType) => void;
+  setSelectedUser: (user: UserType | null) => void;
   getContacts: () => void;
   getMyChatPartners: () => void;
-  getMessagesByUserId: (userId: number) => void;
-  sendMessage: (message: Message) => void;
+  getMessagesByUserId: (userId: string) => void;
+  sendMessage: (message: SendMessageRequest) => void;
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
 };
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -39,7 +42,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   setActiveTab: (tab: string) => {
     set({ activeTab: tab });
   },
-  setSelectedUser: (user: UserType) => {
+  setSelectedUser: (user: UserType | null) => {
     set({ selectedUser: user });
   },
   getContacts: async () => {
@@ -70,7 +73,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         set({ isChatPartnersLoading: false });
       });
   },
-  getMessagesByUserId: async (userId: number) => {
+  getMessagesByUserId: async (userId: string) => {
     set({ isMessagesLoading: true });
     await axiosInstance
       .get(`/messages/${userId}`)
@@ -84,5 +87,60 @@ export const useChatStore = create<ChatState>((set, get) => ({
         set({ isMessagesLoading: false });
       });
   },
-  sendMessage: async (message: Message) => {},
+  sendMessage: async (message: SendMessageRequest) => {
+    const { selectedUser, messages } = get();
+    const { authUser } = useAuthStore.getState();
+    if (!authUser || !selectedUser) return;
+
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage: MessageType = {
+      _id: tempId,
+      senderId: authUser._id,
+      receiverId: selectedUser._id,
+      text: message.text,
+      image: message.image,
+      createdAt: new Date().toISOString(),
+      isOptimistic: true,
+    };
+    // optimistic update for UI (not persisted in DB)
+    set({ messages: [...messages, optimisticMessage] });
+
+    await axiosInstance
+      .post(`/messages/send/${selectedUser._id}`, message)
+      .then((res) => {
+        set({ messages: messages.concat(res.data) });
+      })
+      .catch((e) => {
+        console.error("Error in sendMessage: ", e);
+        set({ messages: messages });
+        toast.error("메세지 전송 실패");
+      });
+  },
+  subscribeToMessages: () => {
+    const { selectedUser, isSoundEnabled } = get();
+    if (!selectedUser) return;
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+    socket.on("newMessage", (newMessage: MessageType) => {
+      const isMessageSentFromSelectedUser =
+        newMessage.senderId === selectedUser._id;
+      if (!isMessageSentFromSelectedUser) return;
+
+      const currentMessages = get().messages;
+      set({ messages: [...currentMessages, newMessage] });
+
+      if (isSoundEnabled) {
+        const notificationSound = new Audio("/sounds/notification.mp3");
+        notificationSound.currentTime = 0;
+        notificationSound.play().catch((e) => {
+          console.log("Audio play failed", e);
+        });
+      }
+    });
+  },
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+    socket.off("newMessage");
+  },
 }));

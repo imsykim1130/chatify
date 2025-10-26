@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import authRouter from "./routes/auth.route.js";
 import messageRouter from "./routes/message.route.js";
 import { CLIENT_URL, PORT } from "./config/env.js";
