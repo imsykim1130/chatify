@@ -1,8 +1,11 @@
 import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const ContactList = () => {
-  const { getContacts, isContactsLoading, contacts } = useChatStore();
+  const { getContacts, isContactsLoading, contacts, setSelectedUser } =
+    useChatStore();
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getContacts();
@@ -16,17 +19,26 @@ const ContactList = () => {
       {contacts.map((contact) => (
         <li
           key={contact._id}
-          className="w-full flex items-center gap-4 py-4 border-b-[0.5px] border-slate-400/15 cursor-pointer"
+          className="bg-cyan-500/10 p-4 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors"
+          onClick={() => setSelectedUser(contact)}
         >
-          <div className="size-12 rounded-full overflow-hidden">
-            <img
-              src={
-                contact.profilePic !== "" ? contact.profilePic : "/avatar.png"
-              }
-              alt="profile image"
-            />
+          <div className="flex items-center gap-3">
+            <div
+              className={`avatar ${onlineUsers.includes(contact._id) ? "avatar-online" : "avatar-offline"}`}
+            >
+              <div className="size-12 rounded-full overflow-hidden">
+                <img
+                  src={
+                    contact.profilePic !== ""
+                      ? contact.profilePic
+                      : "/avatar.png"
+                  }
+                  alt="profile image"
+                />
+              </div>
+            </div>
+            <h4 className="text-slate-200 font-medium">{contact.fullName}</h4>
           </div>
-          <p className="text-slate-200">{contact.fullName}</p>
         </li>
       ))}
     </ul>

@@ -9,7 +9,7 @@ const BASE_URL =
 
 type AuthState = {
   authUser: UserType | null;
-  onlineUsers: number[];
+  onlineUsers: string[];
   isCheckingAuth: boolean;
   isSigningUp: boolean;
   isLoggingIn: boolean;
