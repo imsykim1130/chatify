@@ -2,14 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../lib/jwt.js";
-import {
-  LogInRequest,
-  SignUpRequest,
-  UpdateProfileRequest,
-  UserType,
-} from "../types/auth.type.js";
+import { LogInRequest, SignUpRequest } from "../types/auth.type.js";
 import cloudinary from "../lib/cloudinary.js";
-import multer from "multer";
 
 export const signup = async (req: Request, res: Response) => {
   const { fullName, email, password }: SignUpRequest = req.body;
@@ -100,7 +94,7 @@ export const logout = async (req: Request, res: Response) => {
 export const updateProfile = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { profilePic } = req.body;
@@ -120,7 +114,7 @@ export const updateProfile = async (
           {
             profilePic: response.secure_url,
           },
-          { new: true } // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
+          { new: true }, // By default, findOneAndUpdate() returns the document as it was before update was applied. If you set new: true, findOneAndUpdate() will instead give you the object after update was applied.
         ).select("-password");
         res.status(200).json(updatedUser);
       })

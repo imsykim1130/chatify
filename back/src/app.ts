@@ -13,7 +13,6 @@ import cors from "cors";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// TODO: payload too large error
 // 이미지 base64 는 긴 경우가 많기 때문에 limit 늘려줌
 app.use(express.json({ limit: "10mb" })); // req.body
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
@@ -24,13 +23,13 @@ app.use("/api/v1/messages", messageRouter);
 
 app.use(errorMiddleware);
 
-// 배포 환경에서 static 파일을 가져오는 곳(react)
-if (process.env.NODE_ENV === "prod") {
-  app.use(express.static(path.join(__dirname, "../../front/dist")));
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(__dirname, "../../front", "dist", "index.html"));
-  });
-}
+// // 배포 환경에서 static 파일을 가져오는 곳(react)
+// if (process.env.NODE_ENV === "prod") {
+//   app.use(express.static(path.join(__dirname, "../../front/dist")));
+//   app.get("*", (_, res) => {
+//     res.sendFile(path.join(__dirname, "../../front", "dist", "index.html"));
+//   });
+// }
 
 const port = PORT || 3000;
 server.listen(port, () => {
