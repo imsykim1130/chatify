@@ -31,8 +31,12 @@ app.use(errorMiddleware);
 //   });
 // }
 
-const port = PORT || 3000;
-server.listen(port, () => {
-  console.log("listen ", port);
-  connectDB();
-});
+if (process.env.NODE_ENV === "dev") {
+  const port = PORT || 3000;
+  server.listen(port, () => {
+    console.log("listen ", port);
+    connectDB();
+  });
+}
+
+export default app;
