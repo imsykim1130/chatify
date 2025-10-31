@@ -9,7 +9,7 @@ const BASE_URL =
 
 type AuthState = {
   authUser: UserType | null;
-  onlineUsers: string[];
+  onlineUsers: string[]; // 현재 접속중인 유저 id 리스트
   isCheckingAuth: boolean;
   isSigningUp: boolean;
   isLoggingIn: boolean;
@@ -67,7 +67,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await axiosInstance
       .post("/auth/login", data)
       .then((res) => {
-        console.log(res.data);
         set({ authUser: res.data });
         toast.success("로그인 성공!");
         get().connectSocket();
@@ -109,13 +108,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
   },
   connectSocket: () => {
-    console.log("connect socket");
-
     const { authUser } = get();
+
     if (!authUser || get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
-      withCredentials: true,
+      withCredentials: true, // header with jwt
     });
 
     socket.connect();

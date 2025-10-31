@@ -80,7 +80,7 @@ const ChatContainer = () => {
         ) : isMessagesLoading ? (
           <MessageLoadingSkeleton />
         ) : (
-          <NoChatHistoryPlaceholder />
+          <NoChatHistoryPlaceholder name={selectedUser?.fullName as string} />
         )}
       </div>
 

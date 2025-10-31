@@ -28,7 +28,7 @@ type ChatState = {
 export const useChatStore = create<ChatState>((set, get) => ({
   contacts: [],
   chatPartners: [],
-  messages: [],
+  messages: [], // 현재 채팅방의 채팅 내역
   activeTab: "chats",
   selectedUser: null,
   isContactsLoading: false,
@@ -126,9 +126,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         newMessage.senderId === selectedUser._id;
       if (!isMessageSentFromSelectedUser) return;
 
-      const currentMessages = get().messages;
-      set({ messages: [...currentMessages, newMessage] });
+      const currentMessages = get().messages; // 이전 채팅내역
+      set({ messages: [...currentMessages, newMessage] }); // 새로온 메세지를 채팅내역에 추가
 
+      // 소리 활성화 상태면 새로운 메세지를 알리는 소리 재생
       if (isSoundEnabled) {
         const notificationSound = new Audio("/sounds/notification.mp3");
         notificationSound.currentTime = 0;
