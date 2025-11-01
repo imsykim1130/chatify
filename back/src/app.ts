@@ -40,3 +40,5 @@ server.listen(port, () => {
   console.log("listen ", port);
   connectDB();
 });
+
+export default app;
