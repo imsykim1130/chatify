@@ -41,10 +41,6 @@ app.use(errorMiddleware);
 //   });
 // }
 
-app.get("/", (_req, res) => {
-  res.status(200).json({ message: "Hello World" });
-});
-
 // const port = PORT || 3000;
 // server.listen(port, () => {
 //   console.log("listen ", port);
