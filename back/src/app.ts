@@ -18,6 +18,16 @@ app.use(express.json({ limit: "10mb" })); // req.body
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
+// 모든 라우트 전에 DB 연결 보장
+app.use(async (_req, _res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/messages", messageRouter);
 
@@ -35,10 +45,10 @@ app.get("/", (_req, res) => {
   res.status(200).json({ message: "Hello World" });
 });
 
-const port = PORT || 3000;
-server.listen(port, () => {
-  console.log("listen ", port);
-  connectDB();
-});
-
+// const port = PORT || 3000;
+// server.listen(port, () => {
+//   console.log("listen ", port);
+//   connectDB();
+// });
+//
 export default app;
